@@ -18,7 +18,7 @@ services:
       POSTGRES_USER: vice
       POSTGRES_PASSWORD: vice
     volumes:
-      - ./.docker/postgres/data/:/var/lib/postgresql/data
+      - ./.docker/postgres/data/:/var/lib/postgresql
       - ./.docker/postgres/initdb.d/:/docker-entrypoint-initdb.d/
     ports:
     - 5432:5432

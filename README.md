@@ -51,5 +51,5 @@ The result should look like:
 *ecpm*: Effective Cost Per Mile, the effective cost of 1,000 impressions based on revenue actually delivered. See 
 [this page](https://www.marketingterms.com/dictionary/ecpm/) for information on how to calculate this.
 
- !["ERD IMage"]("https://github.com/jatp24/vice_project/blob/master/img/Vice%20Diagram.png")
+ !["ERD IMage"](https://github.com/jatp24/vice_project/blob/master/img/Vice%20Diagram.png)
 

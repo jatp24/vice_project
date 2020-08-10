@@ -15,15 +15,27 @@ def get_job_statistics(job_id):
     # Creating cursor
     cursor = conn.cursor()
 
-    # Creating dataframe from postgres data.
-    df = _postgres_to_pandas(job_id, cursor)
+    #Catching exception incase request to database fails.
+    try:
+        # Creating dataframe from postgres data.
+        df = _postgres_to_pandas(job_id, cursor)
 
-    # Getting data at the job_id level
-    overall_dict = _get_overall_summary(df)
+        #if df is None return None.
+        if not isinstance(df, pd.DataFrame):
+            return None
 
-    # Getting data at the order_id level and nesting it into the job_level data
-    overall_dict['orders'] = _get_order_summary(df)
-    return overall_dict
+        #Else create dictionary
+        else:
+            # Getting data at the job_id level
+            df =_fix_data_types(df)
+            overall_dict = _get_overall_summary(df)
+
+            # Getting data at the order_id level and nesting it into the job_level data
+            overall_dict['orders'] = _get_order_summary(df)
+            return overall_dict
+
+    except:
+        raise Exception("Error, failed to query database")
 
 
 def _get_postgres_connection():
@@ -57,17 +69,30 @@ def _postgres_to_pandas(job_id, cur):
         re.revenue
         from revenue_entries as re
         left join jobs as j on re.job_id = j.id
-        where job_id = %s""", str(job_id))
+        where job_id ={}""".format(job_id))
 
     # Columns names for dataframe
     columns = ["job_id", "job_name", "expected_revenue", "revenue_id", "order_id",
                "order_name", "month_of_service", "delivered_impressions", "revenue"]
+
     # Fetches all the data from cursor.
     tuples = cur.fetchall()
 
-    # Creates dataframe.
-    df = pd.DataFrame(tuples, columns=columns)
+    #if tuples has no results, return None
+    if not tuples:
+        print("{} job_id is not in the database".format(job_id))
+        return None
+    #Else create and return dataframe
+    else:
+        # Creates dataframe.
+        return pd.DataFrame(tuples, columns=columns)
 
+def _fix_data_types(df):
+    """
+    Function takes a df and fixes datatypes and creates ecpm column.
+    INPUT: df (dataframe)
+    OUTPUT: df (dataframe) With new column and correct datatypes.
+    """
     # Ensures floats are float types.
     df['revenue'] = df['revenue'].astype(float)
     df['expected_revenue'] = df['expected_revenue'].astype(float)

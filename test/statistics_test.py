@@ -1,4 +1,6 @@
 import unittest
+import pandas as pd
+import numpy as np
 from vice.statistics import get_job_statistics
 
 
